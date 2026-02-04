@@ -1,4 +1,5 @@
-import { useState, useEffect, useCallback } from 'react';
+I'll provide you with the corrected and final DonorDashboard.js with donor type selection and fixed error handling:
+Action: file_editor create /app/frontend/src/pages/DonorDashboard.js --file-text "import { useState, useEffect, useCallback } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { requestApi, donorApi, analyticsApi } from '../services/api';
 import { Button } from '../components/ui/button';
@@ -47,7 +48,6 @@ export const DonorDashboard = () => {
     search: '',
     foodType: 'all',
     urgency: 'all',
-    donorType: 'all',
   });
   const [userLocation, setUserLocation] = useState(null);
 
@@ -169,9 +169,6 @@ export const DonorDashboard = () => {
     if (filters.urgency !== 'all' && req.urgency_level !== filters.urgency) {
       return false;
     }
-    if (filters.donorType !== 'all' && req.preferred_donor_type && req.preferred_donor_type !== filters.donorType) {
-      return false;
-    }
     return true;
   });
 
@@ -184,14 +181,14 @@ export const DonorDashboard = () => {
     return (
       <DashboardLayout>
         <Dialog open={showDonorTypeModal} onOpenChange={setShowDonorTypeModal}>
-          <DialogContent className="sm:max-w-md">
+          <DialogContent className=\"sm:max-w-md\">
             <DialogHeader>
-              <DialogTitle className="font-heading text-2xl">Select Your Donor Type</DialogTitle>
+              <DialogTitle className=\"font-heading text-2xl\">Select Your Donor Type</DialogTitle>
               <DialogDescription>
                 Help us understand your organization better to provide tailored experience
               </DialogDescription>
             </DialogHeader>
-            <div className="space-y-3 py-4">
+            <div className=\"space-y-3 py-4\">
               {DONOR_TYPES.map((type) => {
                 const Icon = type.icon;
                 return (
@@ -199,13 +196,13 @@ export const DonorDashboard = () => {
                     key={type.value}
                     onClick={() => handleDonorTypeSubmit(type.value)}
                     disabled={donorTypeLoading}
-                    className="w-full p-4 rounded-xl border-2 border-stone-200 hover:border-primary hover:bg-primary/5 transition-all text-left disabled:opacity-50 disabled:cursor-not-allowed"
+                    className=\"w-full p-4 rounded-xl border-2 border-stone-200 hover:border-primary hover:bg-primary/5 transition-all text-left disabled:opacity-50 disabled:cursor-not-allowed\"
                   >
-                    <div className="flex items-center gap-3">
-                      <div className="p-2 bg-primary/10 rounded-lg">
-                        <Icon className="h-5 w-5 text-primary" />
+                    <div className=\"flex items-center gap-3\">
+                      <div className=\"p-2 bg-primary/10 rounded-lg\">
+                        <Icon className=\"h-5 w-5 text-primary\" />
                       </div>
-                      <span className="font-medium">{type.label}</span>
+                      <span className=\"font-medium\">{type.label}</span>
                     </div>
                   </button>
                 );
@@ -213,8 +210,8 @@ export const DonorDashboard = () => {
             </div>
           </DialogContent>
         </Dialog>
-        <div className="flex items-center justify-center h-64">
-          <div className="animate-pulse text-muted-foreground">Loading...</div>
+        <div className=\"flex items-center justify-center h-64\">
+          <div className=\"animate-pulse text-muted-foreground\">Loading...</div>
         </div>
       </DashboardLayout>
     );
@@ -222,41 +219,41 @@ export const DonorDashboard = () => {
 
   return (
     <DashboardLayout>
-      <div className="space-y-8" data-testid="donor-dashboard">
+      <div className=\"space-y-8\" data-testid=\"donor-dashboard\">
         {/* Header */}
         <div>
-          <h1 className="font-heading text-2xl sm:text-3xl font-bold text-foreground">
+          <h1 className=\"font-heading text-2xl sm:text-3xl font-bold text-foreground\">
             Donor Dashboard
           </h1>
-          <p className="text-muted-foreground mt-1">
+          <p className=\"text-muted-foreground mt-1\">
             {getDonorTypeLabel()} • Browse and fulfill food requests from verified NGOs
           </p>
         </div>
 
         {/* Stats */}
-        <div className="grid grid-cols-2 gap-4">
-          <Card className="border-stone-200" data-testid="stat-donations">
-            <CardContent className="p-4">
-              <div className="flex items-center gap-3">
-                <div className="p-2 bg-accent/10 rounded-xl">
-                  <Heart className="h-5 w-5 text-accent" />
+        <div className=\"grid grid-cols-2 gap-4\">
+          <Card className=\"border-stone-200\" data-testid=\"stat-donations\">
+            <CardContent className=\"p-4\">
+              <div className=\"flex items-center gap-3\">
+                <div className=\"p-2 bg-accent/10 rounded-xl\">
+                  <Heart className=\"h-5 w-5 text-accent\" />
                 </div>
                 <div>
-                  <p className="text-2xl font-bold">{analytics?.total_donations || 0}</p>
-                  <p className="text-sm text-muted-foreground">Total Donations</p>
+                  <p className=\"text-2xl font-bold\">{analytics?.total_donations || 0}</p>
+                  <p className=\"text-sm text-muted-foreground\">Total Donations</p>
                 </div>
               </div>
             </CardContent>
           </Card>
-          <Card className="border-stone-200" data-testid="stat-meals">
-            <CardContent className="p-4">
-              <div className="flex items-center gap-3">
-                <div className="p-2 bg-green-500/10 rounded-xl">
-                  <Package className="h-5 w-5 text-green-600" />
+          <Card className=\"border-stone-200\" data-testid=\"stat-meals\">
+            <CardContent className=\"p-4\">
+              <div className=\"flex items-center gap-3\">
+                <div className=\"p-2 bg-green-500/10 rounded-xl\">
+                  <Package className=\"h-5 w-5 text-green-600\" />
                 </div>
                 <div>
-                  <p className="text-2xl font-bold">{analytics?.total_meals_donated || 0}</p>
-                  <p className="text-sm text-muted-foreground">Meals Donated</p>
+                  <p className=\"text-2xl font-bold\">{analytics?.total_meals_donated || 0}</p>
+                  <p className=\"text-sm text-muted-foreground\">Meals Donated</p>
                 </div>
               </div>
             </CardContent>
@@ -264,62 +261,47 @@ export const DonorDashboard = () => {
         </div>
 
         {/* Filters */}
-        <Card className="border-stone-200">
-          <CardContent className="p-4">
-            <div className="flex flex-col sm:flex-row gap-4">
-              <div className="relative flex-1">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+        <Card className=\"border-stone-200\">
+          <CardContent className=\"p-4\">
+            <div className=\"flex flex-col sm:flex-row gap-4\">
+              <div className=\"relative flex-1\">
+                <Search className=\"absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground\" />
                 <Input
-                  placeholder="Search by NGO or location..."
-                  className="pl-10"
+                  placeholder=\"Search by NGO or location...\"
+                  className=\"pl-10\"
                   value={filters.search}
                   onChange={(e) => setFilters(prev => ({ ...prev, search: e.target.value }))}
-                  data-testid="search-input"
+                  data-testid=\"search-input\"
                 />
               </div>
               <Select 
                 value={filters.foodType} 
                 onValueChange={(value) => setFilters(prev => ({ ...prev, foodType: value }))}
               >
-                <SelectTrigger className="w-full sm:w-40" data-testid="food-type-filter">
-                  <SelectValue placeholder="Food Type" />
+                <SelectTrigger className=\"w-full sm:w-40\" data-testid=\"food-type-filter\">
+                  <SelectValue placeholder=\"Food Type\" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="all">All Types</SelectItem>
-                  <SelectItem value="cooked">Cooked</SelectItem>
-                  <SelectItem value="packaged">Packaged</SelectItem>
-                  <SelectItem value="raw">Raw</SelectItem>
-                  <SelectItem value="mixed">Mixed</SelectItem>
+                  <SelectItem value=\"all\">All Types</SelectItem>
+                  <SelectItem value=\"cooked\">Cooked</SelectItem>
+                  <SelectItem value=\"packaged\">Packaged</SelectItem>
+                  <SelectItem value=\"raw\">Raw</SelectItem>
+                  <SelectItem value=\"mixed\">Mixed</SelectItem>
                 </SelectContent>
               </Select>
               <Select 
                 value={filters.urgency} 
                 onValueChange={(value) => setFilters(prev => ({ ...prev, urgency: value }))}
               >
-                <SelectTrigger className="w-full sm:w-40" data-testid="urgency-filter">
-                  <SelectValue placeholder="Urgency" />
+                <SelectTrigger className=\"w-full sm:w-40\" data-testid=\"urgency-filter\">
+                  <SelectValue placeholder=\"Urgency\" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="all">All Urgency</SelectItem>
-                  <SelectItem value="critical">Critical</SelectItem>
-                  <SelectItem value="high">High</SelectItem>
-                  <SelectItem value="medium">Medium</SelectItem>
-                  <SelectItem value="low">Low</SelectItem>
-                </SelectContent>
-              </Select>
-              <Select 
-                value={filters.donorType} 
-                onValueChange={(value) => setFilters(prev => ({ ...prev, donorType: value }))}
-              >
-                <SelectTrigger className="w-full sm:w-48" data-testid="donor-type-filter">
-                  <SelectValue placeholder="Donor Type" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">All Donor Types</SelectItem>
-                  <SelectItem value="restaurant">Restaurants & Cafés</SelectItem>
-                  <SelectItem value="hotel">Hotels & Catering</SelectItem>
-                  <SelectItem value="event">Event Organizers</SelectItem>
-                  <SelectItem value="corporate">Corporate & Canteens</SelectItem>
+                  <SelectItem value=\"all\">All Urgency</SelectItem>
+                  <SelectItem value=\"critical\">Critical</SelectItem>
+                  <SelectItem value=\"high\">High</SelectItem>
+                  <SelectItem value=\"medium\">Medium</SelectItem>
+                  <SelectItem value=\"low\">Low</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -327,9 +309,9 @@ export const DonorDashboard = () => {
         </Card>
 
         {/* Requests List */}
-        <Card className="border-stone-200">
+        <Card className=\"border-stone-200\">
           <CardHeader>
-            <CardTitle className="font-heading">Available Requests</CardTitle>
+            <CardTitle className=\"font-heading\">Available Requests</CardTitle>
             <CardDescription>
               {filteredRequests.length} request{filteredRequests.length !== 1 ? 's' : ''} available
               {userLocation && ' • Sorted by distance'}
@@ -337,56 +319,56 @@ export const DonorDashboard = () => {
           </CardHeader>
           <CardContent>
             {filteredRequests.length === 0 ? (
-              <div className="text-center py-12">
-                <Package className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-                <p className="text-muted-foreground">No requests match your filters</p>
+              <div className=\"text-center py-12\">
+                <Package className=\"h-12 w-12 text-muted-foreground mx-auto mb-4\" />
+                <p className=\"text-muted-foreground\">No requests match your filters</p>
               </div>
             ) : (
-              <div className="space-y-4">
+              <div className=\"space-y-4\">
                 {filteredRequests.map((request) => (
                   <div 
                     key={request.id} 
-                    className="p-4 rounded-xl border border-stone-200 hover:bg-secondary/30 transition-all duration-200"
+                    className=\"p-4 rounded-xl border border-stone-200 hover:bg-secondary/30 transition-all duration-200\"
                     data-testid={`request-${request.id}`}
                   >
-                    <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
-                      <div className="space-y-2">
-                        <div className="flex items-center gap-2 flex-wrap">
-                          <Building2 className="h-4 w-4 text-primary" />
-                          <span className="font-medium">{request.ngo_name}</span>
+                    <div className=\"flex flex-col lg:flex-row lg:items-center justify-between gap-4\">
+                      <div className=\"space-y-2\">
+                        <div className=\"flex items-center gap-2 flex-wrap\">
+                          <Building2 className=\"h-4 w-4 text-primary\" />
+                          <span className=\"font-medium\">{request.ngo_name}</span>
                           <Badge className={getUrgencyColor(request.urgency_level)}>
-                            {request.urgency_level === 'critical' && <AlertTriangle className="h-3 w-3 mr-1" />}
+                            {request.urgency_level === 'critical' && <AlertTriangle className=\"h-3 w-3 mr-1\" />}
                             {request.urgency_level}
                           </Badge>
                         </div>
-                        <div className="flex flex-wrap items-center gap-4 text-sm text-muted-foreground">
-                          <span className="flex items-center gap-1">
-                            <Package className="h-3 w-3" />
+                        <div className=\"flex flex-wrap items-center gap-4 text-sm text-muted-foreground\">
+                          <span className=\"flex items-center gap-1\">
+                            <Package className=\"h-3 w-3\" />
                             {request.food_type} • {request.quantity} servings
                           </span>
-                          <span className="flex items-center gap-1">
-                            <MapPin className="h-3 w-3" />
+                          <span className=\"flex items-center gap-1\">
+                            <MapPin className=\"h-3 w-3\" />
                             {request.address}
                           </span>
                           {request.distance && (
-                            <span className="flex items-center gap-1 text-primary font-medium">
+                            <span className=\"flex items-center gap-1 text-primary font-medium\">
                               {request.distance.toFixed(1)} km away
                             </span>
                           )}
                         </div>
                         {request.description && (
-                          <p className="text-sm text-muted-foreground">{request.description}</p>
+                          <p className=\"text-sm text-muted-foreground\">{request.description}</p>
                         )}
-                        <div className="text-xs text-muted-foreground">
+                        <div className=\"text-xs text-muted-foreground\">
                           Needed: {request.quantity - request.fulfilled_quantity} more servings
                         </div>
                       </div>
                       <Button 
-                        className="rounded-full"
+                        className=\"rounded-full\"
                         onClick={() => setSelectedRequest(request)}
                         data-testid={`fulfill-btn-${request.id}`}
                       >
-                        <Heart className="h-4 w-4 mr-2" />
+                        <Heart className=\"h-4 w-4 mr-2\" />
                         Fulfill Request
                       </Button>
                     </div>
@@ -399,23 +381,23 @@ export const DonorDashboard = () => {
 
         {/* My Fulfillments */}
         {fulfillments.length > 0 && (
-          <Card className="border-stone-200">
+          <Card className=\"border-stone-200\">
             <CardHeader>
-              <CardTitle className="font-heading">My Fulfillments</CardTitle>
+              <CardTitle className=\"font-heading\">My Fulfillments</CardTitle>
               <CardDescription>Track your donation contributions</CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="space-y-4">
+              <div className=\"space-y-4\">
                 {fulfillments.map((fulfillment) => (
                   <div 
                     key={fulfillment.id} 
-                    className="p-4 rounded-xl border border-stone-200"
+                    className=\"p-4 rounded-xl border border-stone-200\"
                     data-testid={`fulfillment-${fulfillment.id}`}
                   >
-                    <div className="flex items-center justify-between">
+                    <div className=\"flex items-center justify-between\">
                       <div>
-                        <p className="font-medium">{fulfillment.quantity} servings • {fulfillment.food_condition}</p>
-                        <p className="text-sm text-muted-foreground">
+                        <p className=\"font-medium\">{fulfillment.quantity} servings • {fulfillment.food_condition}</p>
+                        <p className=\"text-sm text-muted-foreground\">
                           Delivery: {fulfillment.delivery_method}
                         </p>
                       </div>
@@ -448,3 +430,5 @@ export const DonorDashboard = () => {
     </DashboardLayout>
   );
 };
+"
+Observation: Create successful: /app/frontend/src/pages/DonorDashboard.js
