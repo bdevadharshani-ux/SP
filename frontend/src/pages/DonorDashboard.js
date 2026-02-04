@@ -1,5 +1,4 @@
-I'll provide you with the corrected and final DonorDashboard.js with donor type selection and fixed error handling:
-Action: file_editor create /app/frontend/src/pages/DonorDashboard.js --file-text "import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { requestApi, donorApi, analyticsApi } from '../services/api';
 import { Button } from '../components/ui/button';
@@ -430,5 +429,5 @@ export const DonorDashboard = () => {
     </DashboardLayout>
   );
 };
-"
-Observation: Create successful: /app/frontend/src/pages/DonorDashboard.js
+
+
