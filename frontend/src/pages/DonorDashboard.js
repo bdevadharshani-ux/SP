@@ -43,11 +43,12 @@ export const DonorDashboard = () => {
   const [showDonorTypeModal, setShowDonorTypeModal] = useState(false);
   const [donorType, setDonorType] = useState(null);
   const [donorTypeLoading, setDonorTypeLoading] = useState(false);
-  const [filters, setFilters] = useState({
-    search: '',
-    foodType: 'all',
-    urgency: 'all',
-  });
+ const [filters, setFilters] = useState({
+  search: '',
+  foodType: 'all',
+  dietType: 'all', // veg / non-veg
+  urgency: 'all',
+});
   const [userLocation, setUserLocation] = useState(null);
 
   // Check donor type on mount
@@ -429,5 +430,6 @@ export const DonorDashboard = () => {
     </DashboardLayout>
   );
 };
+
 
 
