@@ -5,7 +5,9 @@ import { Button } from '../components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/card';
 import { Badge } from '../components/ui/badge';
 import { Input } from '../components/ui/input';
+import { Label } from '../components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../components/ui/select';
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '../components/ui/dialog';
 import { DashboardLayout } from '../components/DashboardLayout';
 import { FulfillRequestModal } from '../components/FulfillRequestModal';
 import { 
@@ -17,23 +19,86 @@ import {
   TrendingUp,
   AlertTriangle,
   Filter,
-  Building2
+  Building2,
+  Utensils,
+  Users
 } from 'lucide-react';
 import { toast } from 'sonner';
+import axios from 'axios';
+
+const DONOR_TYPES = [
+  { value: 'restaurant', label: 'Restaurants & Cafés', icon: Utensils },
+  { value: 'hotel', label: 'Hotels & Catering Services', icon: Building2 },
+  { value: 'event', label: 'Marriage Halls & Event Organizers', icon: Users },
+  { value: 'corporate', label: 'Corporate Offices & College Canteens', icon: Building2 }
+];
 
 export const DonorDashboard = () => {
-  const { user } = useAuth();
+  const { user, token } = useAuth();
   const [requests, setRequests] = useState([]);
   const [fulfillments, setFulfillments] = useState([]);
   const [analytics, setAnalytics] = useState(null);
   const [loading, setLoading] = useState(true);
   const [selectedRequest, setSelectedRequest] = useState(null);
+  const [showDonorTypeModal, setShowDonorTypeModal] = useState(false);
+  const [donorType, setDonorType] = useState(null);
+  const [donorTypeLoading, setDonorTypeLoading] = useState(false);
   const [filters, setFilters] = useState({
     search: '',
     foodType: 'all',
     urgency: 'all',
+    donorType: 'all',
   });
   const [userLocation, setUserLocation] = useState(null);
+
+  // Check donor type on mount
+  useEffect(() => {
+    const checkDonorType = async () => {
+      try {
+        const response = await axios.get(
+          `${process.env.REACT_APP_BACKEND_URL}/api/donor/profile`,
+          {
+            headers: { Authorization: `Bearer ${token}` }
+          }
+        );
+        
+        if (response.data && response.data.donor_type) {
+          setDonorType(response.data.donor_type);
+        } else {
+          setShowDonorTypeModal(true);
+        }
+      } catch (error) {
+        // If profile doesn't exist or no donor_type, show modal
+        setShowDonorTypeModal(true);
+      }
+    };
+
+    if (user && user.role === 'donor') {
+      checkDonorType();
+    }
+  }, [user, token]);
+
+  const handleDonorTypeSubmit = async (selectedType) => {
+    setDonorTypeLoading(true);
+    try {
+      await axios.post(
+        `${process.env.REACT_APP_BACKEND_URL}/api/donor/profile`,
+        { donor_type: selectedType },
+        {
+          headers: { Authorization: `Bearer ${token}` }
+        }
+      );
+      
+      setDonorType(selectedType);
+      setShowDonorTypeModal(false);
+      toast.success('Donor type saved successfully!');
+    } catch (error) {
+      console.error('Error saving donor type:', error);
+      toast.error('Failed to save donor type. Please try again.');
+    } finally {
+      setDonorTypeLoading(false);
+    }
+  };
 
   const fetchData = useCallback(async () => {
     try {
@@ -54,6 +119,7 @@ export const DonorDashboard = () => {
       setAnalytics(anaRes.data);
     } catch (error) {
       console.error('Error fetching data:', error);
+      toast.error('Failed to load data');
     } finally {
       setLoading(false);
     }
@@ -77,15 +143,17 @@ export const DonorDashboard = () => {
   }, []);
 
   useEffect(() => {
-    fetchData();
-  }, [fetchData]);
+    if (donorType) {
+      fetchData();
+    }
+  }, [fetchData, donorType]);
 
   const getUrgencyColor = (urgency) => {
     const colors = {
-      critical: 'bg-destructive text-destructive-foreground',
-      high: 'bg-accent text-accent-foreground',
-      medium: 'bg-warning text-warning-foreground',
-      low: 'bg-secondary text-secondary-foreground',
+      critical: 'bg-red-500 text-white',
+      high: 'bg-orange-500 text-white',
+      medium: 'bg-yellow-500 text-white',
+      low: 'bg-green-500 text-white',
     };
     return colors[urgency] || colors.medium;
   };
@@ -101,12 +169,50 @@ export const DonorDashboard = () => {
     if (filters.urgency !== 'all' && req.urgency_level !== filters.urgency) {
       return false;
     }
+    if (filters.donorType !== 'all' && req.preferred_donor_type && req.preferred_donor_type !== filters.donorType) {
+      return false;
+    }
     return true;
   });
 
-  if (loading) {
+  const getDonorTypeLabel = () => {
+    const type = DONOR_TYPES.find(t => t.value === donorType);
+    return type ? type.label : 'Donor';
+  };
+
+  if (loading || !donorType) {
     return (
       <DashboardLayout>
+        <Dialog open={showDonorTypeModal} onOpenChange={setShowDonorTypeModal}>
+          <DialogContent className="sm:max-w-md">
+            <DialogHeader>
+              <DialogTitle className="font-heading text-2xl">Select Your Donor Type</DialogTitle>
+              <DialogDescription>
+                Help us understand your organization better to provide tailored experience
+              </DialogDescription>
+            </DialogHeader>
+            <div className="space-y-3 py-4">
+              {DONOR_TYPES.map((type) => {
+                const Icon = type.icon;
+                return (
+                  <button
+                    key={type.value}
+                    onClick={() => handleDonorTypeSubmit(type.value)}
+                    disabled={donorTypeLoading}
+                    className="w-full p-4 rounded-xl border-2 border-stone-200 hover:border-primary hover:bg-primary/5 transition-all text-left disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    <div className="flex items-center gap-3">
+                      <div className="p-2 bg-primary/10 rounded-lg">
+                        <Icon className="h-5 w-5 text-primary" />
+                      </div>
+                      <span className="font-medium">{type.label}</span>
+                    </div>
+                  </button>
+                );
+              })}
+            </div>
+          </DialogContent>
+        </Dialog>
         <div className="flex items-center justify-center h-64">
           <div className="animate-pulse text-muted-foreground">Loading...</div>
         </div>
@@ -122,7 +228,9 @@ export const DonorDashboard = () => {
           <h1 className="font-heading text-2xl sm:text-3xl font-bold text-foreground">
             Donor Dashboard
           </h1>
-          <p className="text-muted-foreground mt-1">Browse and fulfill food requests from verified NGOs</p>
+          <p className="text-muted-foreground mt-1">
+            {getDonorTypeLabel()} • Browse and fulfill food requests from verified NGOs
+          </p>
         </div>
 
         {/* Stats */}
@@ -143,8 +251,8 @@ export const DonorDashboard = () => {
           <Card className="border-stone-200" data-testid="stat-meals">
             <CardContent className="p-4">
               <div className="flex items-center gap-3">
-                <div className="p-2 bg-success/10 rounded-xl">
-                  <Package className="h-5 w-5 text-success" />
+                <div className="p-2 bg-green-500/10 rounded-xl">
+                  <Package className="h-5 w-5 text-green-600" />
                 </div>
                 <div>
                   <p className="text-2xl font-bold">{analytics?.total_meals_donated || 0}</p>
@@ -199,6 +307,21 @@ export const DonorDashboard = () => {
                   <SelectItem value="low">Low</SelectItem>
                 </SelectContent>
               </Select>
+              <Select 
+                value={filters.donorType} 
+                onValueChange={(value) => setFilters(prev => ({ ...prev, donorType: value }))}
+              >
+                <SelectTrigger className="w-full sm:w-48" data-testid="donor-type-filter">
+                  <SelectValue placeholder="Donor Type" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All Donor Types</SelectItem>
+                  <SelectItem value="restaurant">Restaurants & Cafés</SelectItem>
+                  <SelectItem value="hotel">Hotels & Catering</SelectItem>
+                  <SelectItem value="event">Event Organizers</SelectItem>
+                  <SelectItem value="corporate">Corporate & Canteens</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
           </CardContent>
         </Card>
@@ -223,7 +346,7 @@ export const DonorDashboard = () => {
                 {filteredRequests.map((request) => (
                   <div 
                     key={request.id} 
-                    className="p-4 rounded-xl border border-stone-200 hover:bg-secondary/30 smooth-transition"
+                    className="p-4 rounded-xl border border-stone-200 hover:bg-secondary/30 transition-all duration-200"
                     data-testid={`request-${request.id}`}
                   >
                     <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
@@ -264,7 +387,7 @@ export const DonorDashboard = () => {
                         data-testid={`fulfill-btn-${request.id}`}
                       >
                         <Heart className="h-4 w-4 mr-2" />
-                        Fulfill
+                        Fulfill Request
                       </Button>
                     </div>
                   </div>
@@ -297,9 +420,9 @@ export const DonorDashboard = () => {
                         </p>
                       </div>
                       <Badge className={
-                        fulfillment.status === 'confirmed' ? 'bg-success text-success-foreground' :
-                        fulfillment.status === 'delivered' ? 'bg-primary text-primary-foreground' :
-                        'bg-warning text-warning-foreground'
+                        fulfillment.status === 'confirmed' ? 'bg-green-500 text-white' :
+                        fulfillment.status === 'delivered' ? 'bg-blue-500 text-white' :
+                        'bg-yellow-500 text-white'
                       }>
                         {fulfillment.status}
                       </Badge>
